@@ -1,0 +1,8 @@
+---
+# Proxmox Configuration vm-core
+proxmox_ip: "192.168.1.68"
+proxmox_user: "root"
+
+# GitLab Configuration devops-forge
+gitlab_ip: "192.168.1.181"
+gitlab_user: "wnbui"

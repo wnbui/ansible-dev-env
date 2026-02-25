@@ -3,6 +3,7 @@
 *.log
 
 # Secrets and Credentials
+inventory/group_vars/all.yaml
 
 # SSH Keys
 *.pem
@@ -32,4 +33,7 @@ Thumbs.db
 # Editor
 .vscode/
 .idea/
-*.sublime-*
+*.sublime-*homelab_ansible*
+
+
+homelab_ansible*
