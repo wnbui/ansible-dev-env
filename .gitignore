@@ -3,7 +3,7 @@
 *.log
 
 # Secrets and Credentials
-inventory/group_vars/all.yaml
+inventory/group_vars/all.yml
 
 # SSH Keys
 *.pem
