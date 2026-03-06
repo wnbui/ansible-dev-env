@@ -1,0 +1,39 @@
+---
+- name: Create GitLab User via API
+  hosts: localhost
+  gather_facts: false # Disable gathering facts about the localhost for faster execution
+
+
+  vars:
+    gitlab_url: "http://192.168.1.181"
+    new_username: "dev101"
+    new_password: "TestPassword123!"
+    new_email: "dev101@homelab.local"
+
+  tasks:
+    - name: Create GitLab user
+      ansible.builtin.uri:
+        url: "{{ gitlab_url }}/api/v4/users"
+        method: POST
+        headers:
+          PRIVATE-TOKEN: "{{ gitlab_admin_token }}"
+        body_format: json
+        body:
+          email: "{{ new_email }}"
+          username: "{{ new_username }}"
+          name: " Dev User 101"
+          password: "{ new_password}"
+          skip_confirmation: true
+        status_code: [201, 409]
+      register: user_creation
+
+    - name: Display result
+      ansible.builtin.debug:
+        msg: "User created: {{ new_username }}"
+      when: user_creation.status == 201
+
+    - name: Display if user exists
+      ansible.builtin.debug:
+        msg: "User already exists: {{ new_username}}"
+      when: user_creation.status == 409
+
