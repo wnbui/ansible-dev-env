@@ -1,0 +1,38 @@
+---
+- name: Install Git on Ubuntu Server 24.04
+  hosts: gitlab
+  become: true
+
+  tasks:
+    - name: Update apt update_cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install Git
+      ansible.builtin.apt:
+        name: git
+        state: latest
+
+    - name: Configure Git username
+      community.general.git_config:
+        name: user.name
+        value: "Test user"
+        scope: global
+      become_user: wnbui
+
+    - name: Configure Git email
+      community.general.git_config:
+        name: user.email
+        value: "testuser@example.com"
+        scope: global
+      become_user: wnbui
+
+    - name: Check Git version
+      ansible.builtin.command: git --version
+      register: git_version
+      changed_when: false
+    
+    - name: Display Git version
+      ansible.builtin.debug:
+        msg: "{{ git_version.stdout }}"

@@ -1,0 +1,63 @@
+---
+- name: Set up dev VM
+  hosts: dev_vms
+  become: true
+
+  tasks:
+    - name: Update apt update_cache
+      ansible.builtin.apt:
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Install Git
+      ansible.builtin.apt:
+        name: git
+        state: latest
+
+    # Add name of GitLab server to host file
+    - name: Add GitLab to /etc/hosts
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        line: "192.168.1.181     gitlab.local"
+        state: present
+
+    - name: Configure Git username
+      community.general.git_config:
+        name: user.name
+        value: "wnbui"
+        scope: global
+      become_user: wnbui
+
+    - name: Configure Git email
+      community.general.git_config:
+        name: user.email
+        value: "wnbui05@gmail.com"
+        scope: global
+      become_user: wnbui
+
+    # Run git command to check for version and stores in variable git_version
+    - name: Check Git version
+      ansible.builtin.command: git --version
+      register: git_version
+      changed_when: false
+    
+    - name: Display Git version
+      ansible.builtin.debug:
+        msg: "{{ git_version.stdout }}"
+
+    - name: Configure Git credential storage
+      community.general.git_config:
+        name: credential.helper
+        value: store
+        scope: global
+      become_user: wnbui
+
+    # Store credentials for GitLab
+    - name: Create .git-credentials file
+      ansible.builtin.copy:
+        content: "http://wnbui:%23Password1234@gitlab.local\n"
+        dest: "/home/wnbui/.git-credentials"
+        mode: '0600'
+        owner: wnbui
+        group: wnbui
+
