@@ -1,0 +1,34 @@
+---
+- name: Create Multiple GitLab Users via API
+  hosts: localhost # Target local machine to run API call
+  gather_facts: false
+  vars_files:
+    - ../vars/dev_users.yml
+
+  vars:
+    gitlab_url: "http://192.168.1.181"
+
+  tasks:
+    - name: Create GitLab users
+      ansible.builtin.uri: # Interact with webservices (APIs)
+        # https://docs.gitlab.com/api/users/
+        url: "{{ gitlab_url }}/api/v4/users"
+        method: POST
+        headers:
+          PRIVATE-TOKEN: "{{ gitlab_admin_token }}"
+        body_format: json
+        body:
+          email: "{{ item.email }}"
+          username: "{{ item.username }}"
+          password: "{{ item.password }}"
+          name: "{{ item.name }}"
+          admin: false
+          skip_confirmation: true
+        status_code: [201, 409]
+      loop: "{{ dev_users }}" # Loop over every user in the /vars/dev-users.yml
+      register: users_results # Store result list to be used
+
+    - name: Display results
+      ansible.builtin.debug:
+        msg: "User {{ item.item.username }}: {{ 'created' if item.status == 201 else 'already exist' }}"
+      loop: "{{ users_results.results }}"

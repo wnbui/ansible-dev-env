@@ -3,7 +3,6 @@
   hosts: localhost
   gather_facts: false # Disable gathering facts about the localhost for faster execution
 
-
   vars:
     gitlab_url: "http://192.168.1.181"
     new_username: "dev101"
@@ -12,7 +11,7 @@
 
   tasks:
     - name: Create GitLab user
-      ansible.builtin.uri:
+      ansible.builtin.uri: # Interact with web services (APIs)
         url: "{{ gitlab_url }}/api/v4/users"
         method: POST
         headers:
@@ -22,7 +21,7 @@
           email: "{{ new_email }}"
           username: "{{ new_username }}"
           name: " Dev User 101"
-          password: "{ new_password}"
+          password: "{{ new_password }}"
           skip_confirmation: true
         status_code: [201, 409]
       register: user_creation
@@ -34,6 +33,5 @@
 
     - name: Display if user exists
       ansible.builtin.debug:
-        msg: "User already exists: {{ new_username}}"
+        msg: "User already exists: {{ new_username }}"
       when: user_creation.status == 409
-

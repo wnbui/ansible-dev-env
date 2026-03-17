@@ -1,0 +1,48 @@
+- name: Create VM from template
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - ../inventory/group_vars/all.yml
+
+  vars:
+    proxmox_api_host: "{{ proxmox_ip }}"
+    proxmox_api_user: "root@pam"
+    proxmox_node: "{{ prox_node }}"
+    template_vm_name: "ubuntu-server-2404-template"
+    vm_id: 9000
+    new_vm_id: 103
+    new_vm_name: "dev-vm-102"
+
+  tasks:
+    - name: Clone VM from template
+      community.proxmox.proxmox_kvm:
+        api_user: "{{ proxmox_api_user }}"
+        api_password: "{{ proxmox_api_password }}"
+        api_host: "{{ proxmox_api_host }}"
+        clone: "{{ template_vm_name }}"
+        name: "{{ new_vm_name }}"
+        newid: "{{ new_vm_id }}"
+        node: "{{ proxmox_node }}"
+        storage: local-lvm
+        full: true
+        format: raw
+        timeout: 500
+      register: vm_created
+
+    - name: Start the VM
+      community.proxmox.proxmox_kvm:
+        api_host: "{{ proxmox_api_host }}"
+        api_user: "{{ proxmox_api_user }}"
+        api_password: "{{ proxmox_api_password }}"
+        node: "{{ proxmox_node }}"
+        # name: "{{ new_vm_name }}"
+        vmid: "{{ new_vm_id }}"
+        state: started
+
+    - name: Wait for VM to boot
+      ansible.builtin.pause:
+        seconds: 15
+
+    - name: Display result
+      ansible.builtin.debug:
+        msg: "VM {{ new_vm_name }} {{ new_vm_id }} created and started"

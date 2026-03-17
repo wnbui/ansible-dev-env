@@ -1,0 +1,16 @@
+---
+dev_users:
+  - username: dev102
+    password: "Password123!"
+    email: "dev102@homelab.local"
+    name: "Dev User 102"
+
+  - username: dev103
+    password: "Password123!"
+    email: "dev103@homelab.local"
+    name: "Dev User 103"
+
+  - username: dev104
+    password: "Password123!"
+    email: "dev104@homelab.local"
+    name: "Dev User 104"
