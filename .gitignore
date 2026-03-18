@@ -4,6 +4,7 @@
 
 # Secrets and Credentials
 inventory/group_vars/all.yml
+outputs/dev_credentials.csv
 
 # SSH Keys
 *.pem
