@@ -9,5 +9,7 @@ proxmox_api_password: "#Vina3004"
 gitlab_ip: "192.168.1.181"
 gitlab_user: "wnbui"
 
+dev_vm_ip: "192.168.1.98"
+
 # Token
 gitlab_admin_token: "glpat-KwIu6YoteysmWDNMjpRilW86MQp1OjIH.01.0w0k3vgml"
