@@ -11,7 +11,7 @@
     template_vm_name: "ubuntu-server-2404-template"
     vm_id: 9000
     new_vm_id: 103
-    new_vm_name: "dev-vm-102"
+    new_vm_name: "dev-vm-{{ new_vm_id }}"
 
   tasks:
     - name: Clone VM from template
@@ -35,13 +35,33 @@
         api_user: "{{ proxmox_api_user }}"
         api_password: "{{ proxmox_api_password }}"
         node: "{{ proxmox_node }}"
-        # name: "{{ new_vm_name }}"
+        name: "{{ new_vm_name }}"
         vmid: "{{ new_vm_id }}"
         state: started
 
     - name: Wait for VM to boot
       ansible.builtin.pause:
         seconds: 15
+
+    - name: Get VM IP address
+      ansible.builtin.script: "{{ playbook_dir }}/../scripts/get_vm_ip.sh {{ new_vm_id }} "
+      register: vm_ip_raw
+
+    - name: Clean IP address
+      ansible.builtin.set_fact:
+        vm_ip: "{{ vm_ip_raw.stdout | trim }}"
+
+    - name: Add VM to inventory
+      ansible.builtin.add_host:
+        name: "{{ new_vm_name }}"
+        groups: newly_created
+        ansible_host: "{{ vm_ip }}"
+        ansible_user: ubuntu
+        ansible_ssh_private_key_file: ~/.ssh/homelab_ansible
+
+    - name: Debug added host
+      ansible.builtin.debug:
+        msg: "Name: '{{ new_vm_name }}' IP: '{{ vm_ip }}'"
 
     - name: Display result
       ansible.builtin.debug:
