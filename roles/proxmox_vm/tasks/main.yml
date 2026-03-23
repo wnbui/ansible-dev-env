@@ -1,0 +1,36 @@
+---
+- name: Clone VM from template
+  community.proxmox.proxmox_kvm:
+    api_user: "{{ proxmox_api_user }}"
+    api_password: "{{ proxmox_api_password }}"
+    api_host: "{{ proxmox_api_host }}"
+    node: "{{ proxmox_node }}"
+    vmid: "{{ proxmox_vmid_item.vmid }}"
+    name: "dev-vm-{{ proxmox_vm_item.vmid }}"
+    clone: "{{ proxmox_vm_template_id }}"
+    storage: "{{ proxmox_vm_storage }}"
+    full: true
+    format: raw
+    timeout: 300
+
+- name: Configure VM Resources
+  community.proxmox.proxmox_kvm:
+    api_host: "{{ proxmox_api_host }}"
+    api_user: "{{ proxmox_api_user }}"
+    api_password: "{{ proxmox_api_password }}"
+    node: "{{ proxmox_node }}"
+    name: "dev-vm-{{ proxmox_vm_item.vmid }}"
+    vmid: "{{ proxmox_vmid_item.vmid }}"
+    memory: "{{ proxmox_vm_memory }}"
+    cores: "{{ proxmox_vm_cores }}"
+    update: true
+
+- name: Start VM
+  community.proxmox.proxmox_kvm:
+    api_host: "{{ proxmox_api_host }}"
+    api_user: "{{ proxmox_api_user }}"
+    api_password: "{{ proxmox_api_password }}"
+    node: "{{ proxmox_node }}"
+    name: "dev-vm-{{ proxmox_vm_item.vmid }}"
+    vm_id: "{{ proxmox_vm_item.vmid }}"
+    state: started

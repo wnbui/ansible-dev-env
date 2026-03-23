@@ -1,0 +1,26 @@
+---
+- name: Create GitLab user
+  ansible.builtin.uri:
+    url: "{{ gitlab_url }}/api/v4/users"
+    method: POST
+    headers:
+      PRIVATE-TOKEN: "{{ gitlab_admin_token }}"
+    body_format: json
+    body:
+      email: "{{ gitlab_user_item.email }}"
+      username: "{{ gitlab_user_item.userame }}"
+      name: "{{ gitlab_user_item.name }}"
+      password: "{{ gitlab_user_item.password }}"
+      skip_confirmation: true
+    status_code: [201, 409]
+  register: gitlab_user_result
+
+- name: Display result
+  ansible.builtin.debug:
+    msg: "User created: {{ new_username }}"
+  when: user_creation.status == 201
+
+- name: Display if user exists
+  ansible.builtin.debug:
+    msg: "User already exists: {{ new_username }}"
+  when: user_creation.status == 409

@@ -1,0 +1,29 @@
+---
+- name: Generate VM credentials
+  ansible.builtin.set_fact:
+    credential_generator_vm_credentials: "{{ vm_credentials | default([]) + [new_cred] }}"
+  loop: "{{ range(0, num_vms) | list }}"
+  loop_control:
+    loop_var: loop_counter
+  vars:
+    vm_id: "{{ vm_base_id + loop_counter + 1 }}"
+    new_cred:
+      vmid: "{{ vm_id }}"
+      username: "dev{{ vm_id }}"
+      password: "{{ lookup('password'), '/dev/null chars=ascii_letters,digits length=16' }}"
+      email: "dev{{ vm_id }}@homelab.local"
+      name: "Dev User {{ vm_id }}"
+
+- name: Display credential summary
+  ansible.builtin.debug:
+    msg: "Generated {{ credential_generator_vm_credentials | length }} credentials"
+
+- name: Save credentials to CSV
+  ansible.builtin.copy:
+    content: |
+      vmid,username,password,email,name
+      {% for cred in credential_generator_vm_credentials %}
+      {{ cred.vmid }},{{ cred.username }},{{ cred.password }},{{ cred.email }},{{ cred.name }}
+      {% endfor %}
+    dest: "{{ credential_generator_output_file }}"
+    mode: "0600"

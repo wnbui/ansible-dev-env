@@ -1,0 +1,5 @@
+---
+proxmox_vm_template_id: 9000
+proxmox_vm_storage: "local-lvm"
+proxmox_vm_memory: 2048
+proxmox_vm_cores: 2

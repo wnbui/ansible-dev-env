@@ -1,0 +1,2 @@
+---
+credential_generator_output_file: "{{ ./output/dev_credentials.csv }}"
