@@ -1,0 +1,3 @@
+---
+git_setup_gitlab_hostname: "gitlab.local"
+git_setup_user: "ubuntu"

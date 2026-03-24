@@ -1,0 +1,54 @@
+---
+- name: Ipdate apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+  become: true
+
+- name: Install Git
+  ansible.builtin.apt:
+    name: git
+    state: present
+  become: true
+
+# Use only if no DNS service is present on homelab
+# Replace single line only
+- name: Add GitLab to /etc/hosts
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    line: "{{ git_setup_gitlab_ip }}   {{ git_setup_gitlab_hostname }}"
+    state: present
+  become: true
+
+- name: Configure Git username
+  community.general.git_config:
+    name: user.name
+    value: "{{ git_setup_username }}"
+    scope: global
+  become: true
+  become_user: "{{ git_setup_user }}"
+
+- name: Configure Git email
+  community.general.git_config:
+    name: user.email
+    value: "{{ git_setup_email }}"
+    scope: global
+  become: true
+  become_user: "{{ git_setup_user }}"
+
+- name: Configure Git credential helper
+  community.general.git_config:
+    name: credential.helper
+    value: store
+    scope: global
+  become: true
+  become_user: "{{ git_setup_user }}"
+
+- name: Create .git-credentials file
+  ansible.builtin.copy:
+    content: "http://{{ git_setup_username }}:{{ git_setup_password | urlencode }}@{{ git_setup_gitlab_hostname }}\n"
+    dest: "/home/{{ git_setup_user }}/.git-credentials"
+    mode: '0600'
+    owner: "{{ git_setup_user }}"
+    group: "{{ git_setup_user }}"
+  become: true

@@ -1,0 +1,4 @@
+---
+- name: Generalte credentials
+  hosts: localhost
+  gather_facts: false

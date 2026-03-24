@@ -12,13 +12,14 @@
     - name: Install Git
       ansible.builtin.apt:
         name: git
-        state: latest
+        state: present
 
     - name: Configure Git username
       community.general.git_config:
         name: user.name
         value: "Test user"
         scope: global
+      become: true
       become_user: wnbui
 
     - name: Configure Git email
@@ -26,13 +27,14 @@
         name: user.email
         value: "testuser@example.com"
         scope: global
+      become: true
       become_user: wnbui
 
     - name: Check Git version
-      ansible.builtin.command: git --version
+      ansible.builtin.shell: git --version
       register: git_version
       changed_when: false
-    
+
     - name: Display Git version
       ansible.builtin.debug:
         msg: "{{ git_version.stdout }}"
