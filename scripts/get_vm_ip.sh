@@ -1,6 +1,6 @@
 #!/bin/bash
 VM_ID=$1
-PROXMOX_HOST="192.168.1.68"
+PROXMOX_HOST=$2
 
 ssh -i ~/.ssh/homelab_ansible root@${PROXMOX_HOST} \
   "qm guest cmd ${VM_ID} network-get-interfaces" | \

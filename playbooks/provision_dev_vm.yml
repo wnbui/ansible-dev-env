@@ -1,0 +1,86 @@
+---
+- name: Generalte credentials
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+    single_vm_id: 201
+    dev_username: devuser
+    dev_name: First Last
+
+  tasks:
+    - name: Set VM credentials
+      ansible.builtin.set_fact:
+        single_vm_cred:
+          vmid: "{{ single_vm_id }}"
+          username: "{{ dev_username }}"
+          password: "{{ lookup('ansible.builtin.password', '/dev/null', chars=['ascii_letters', 'digits'], length=16) }}"
+          email: "{{ dev_username }}@homelab.local"
+          name: "{{ dev_name }}"
+
+    - name: Ensure CSV exists with header
+      ansible.builtin.copy:
+        content: "vmid,name,email,username,password"
+        dest: "../outputs/dev_credentials.csv"
+        force: false
+        mode: '0600'
+
+    - name: Save credentials
+      ansible.builtin.lineinfile:
+        path: "../outputs/dev_credentials.csv"
+        line: "{{ single_vm_cred.vmid }},{{ single_vm_cred.name }},{{ single_vm_cred.email }},{{ single_vm_cred.username }},{{ single_vm_cred.password }}"
+
+- name: Create VM on Proxmox
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Use proxmox_vm role
+      ansible.builtin.include_role:
+        name: proxmox_vm
+      vars:
+        proxmox_vm_item: "{{ hostvars['localhost']['single_vm_cred'] }}"
+        proxmox_vm_memory: 4096
+        proxmox_vm_cores: 2
+
+- name: Create GitLab User
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: User gitlab_user role
+      ansible.builtin.include_role:
+        name: gitlab_user
+      vars:
+        gitlab_user_item: "{{ hostvars['localhost']['single_vm_cred'] }}"
+
+- name: Wait and Get VM IP
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Wait for VM to boot
+      ansible.builtin.pause:
+        seconds: 30
+
+    - name: Get VM IP
+      ansible.builtin.script:
+        cmd: ./scripts/get_vm_ip.sh {{ single_vm_cred.vmid }} {{ proxmox_ip_host }}
+      register: vm_ip
+      retries: 10
+      delay: 10
+      until: vm_ip.stdout != "unknown"
+
+    - name: Display VM IP
+      ansible.builtin.debug:
+        msg: "VM IP: {{ vm_ip.stdout }}"
+
+    - name: Add VM to inventory (temp for Ansible to use in next step)
+      ansible.builtin.add_host:
+        name: "dev-vm-{{ single_vm_cred.vmid }}"
+        groups: dev_vms
+        ansible_host: "{{ vm_ip.stdout }}"
+        ansible_user: ubuntu
+        ansible_ssh_private_key_file: ~/.ssh/homelab_ansible
+        # it doesn't make sense to use ubuntu
+        # how about using the created username and password to log in and verify?
