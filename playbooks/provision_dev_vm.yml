@@ -65,7 +65,7 @@
 
     - name: Get VM IP
       ansible.builtin.script:
-        cmd: ./scripts/get_vm_ip.sh {{ single_vm_cred.vmid }} {{ proxmox_ip_host }}
+        cmd: ../scripts/get_vm_ip.sh {{ single_vm_cred.vmid }} {{ proxmox_api_host }}
       register: vm_ip
       retries: 10
       delay: 10

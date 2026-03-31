@@ -1,13 +1,14 @@
 ---
 # Proxmox Configuration vm-core
 proxmox_node: "vm-core"
-proxmox_ip_host: "192.168.1.68"
-proxmox_api_user: "root"
+proxmox_api_host: "192.168.1.68"
+proxmox_api_user: "root@pam"
 proxmox_api_password: "#Vina3004"
 
 # GitLab Configuration devops-forge
 gitlab_ip: "192.168.1.181"
 gitlab_user: "wnbui"
+gitlab_url: "http://192.168.1.181"
 
 dev_vm_ip: "192.168.1.98"
 

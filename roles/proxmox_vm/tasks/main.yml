@@ -5,9 +5,9 @@
     api_password: "{{ proxmox_api_password }}"
     api_host: "{{ proxmox_api_host }}"
     node: "{{ proxmox_node }}"
-    vmid: "{{ proxmox_vmid_item.vmid }}"
+    newid: "{{ proxmox_vm_item.vmid }}"
     name: "dev-vm-{{ proxmox_vm_item.vmid }}"
-    clone: "{{ proxmox_vm_template_id }}"
+    clone: "{{ proxmox_vm_template_name }}"
     storage: "{{ proxmox_vm_storage }}"
     full: true
     format: raw
@@ -20,7 +20,7 @@
     api_password: "{{ proxmox_api_password }}"
     node: "{{ proxmox_node }}"
     name: "dev-vm-{{ proxmox_vm_item.vmid }}"
-    vmid: "{{ proxmox_vmid_item.vmid }}"
+    vmid: "{{ proxmox_vm_item.vmid }}"
     memory: "{{ proxmox_vm_memory }}"
     cores: "{{ proxmox_vm_cores }}"
     update: true
@@ -32,5 +32,5 @@
     api_password: "{{ proxmox_api_password }}"
     node: "{{ proxmox_node }}"
     name: "dev-vm-{{ proxmox_vm_item.vmid }}"
-    vm_id: "{{ proxmox_vm_item.vmid }}"
+    vmid: "{{ proxmox_vm_item.vmid }}"
     state: started

@@ -8,19 +8,19 @@
     body_format: json
     body:
       email: "{{ gitlab_user_item.email }}"
-      username: "{{ gitlab_user_item.userame }}"
+      username: "{{ gitlab_user_item.username }}"
       name: "{{ gitlab_user_item.name }}"
       password: "{{ gitlab_user_item.password }}"
       skip_confirmation: true
     status_code: [201, 409]
-  register: gitlab_user_result
+  register: gitlab_user_created
 
 - name: Display result
   ansible.builtin.debug:
-    msg: "User created: {{ new_username }}"
-  when: user_creation.status == 201
+    msg: "User created: {{ gitlab_user_item.username }}"
+  when: gitlab_user_created.status == 201
 
 - name: Display if user exists
   ansible.builtin.debug:
-    msg: "User already exists: {{ new_username }}"
-  when: user_creation.status == 409
+    msg: "User already exists: {{ gitlab_user_item.username }}"
+  when: gitlab_user_created.status == 409
