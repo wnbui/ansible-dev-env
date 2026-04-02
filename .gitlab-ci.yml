@@ -1,0 +1,22 @@
+---
+image: cytopia/ansible:latest
+
+stages:
+  - provision
+
+provision_vm:
+  stage: provision
+  when: manual
+  variables:
+    VM_ID: "202"
+  before_script:
+    # Install required ansible collections
+    - ansible-galaxy collection install community.general
+    - ansible-galaxy collection install community.proxmox
+  script:
+    - echo "Provision VM with ID ${VM_ID}"
+    - ansible-playbook playbooks/provision_dev_vm.yml
+      - e "single_vm_id=${VM_ID}"
+      -K
+  only:
+    - main
